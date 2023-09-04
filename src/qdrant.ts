@@ -36,11 +36,11 @@ const qdrant = ({ collection }: { collection: string }) => ({
 		).json()
 	},
 	searchPoints: async ({
-		embedding,
+		vector,
 		limit,
 		filter,
 	}: {
-		embedding: number[]
+		vector: number[]
 		limit: number
 		filter?: Record<string, string | number>
 	}) => {
@@ -51,7 +51,7 @@ const qdrant = ({ collection }: { collection: string }) => ({
 					{
 						method: "POST",
 						body: JSON.stringify({
-							vector: embedding,
+							vector,
 							limit,
 							filter:
 								filter !== undefined

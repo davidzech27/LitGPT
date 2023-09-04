@@ -55,6 +55,18 @@ const Book = ({ title, author }: { title: string; author: string }) => ({
 			},
 		])
 	},
+	segments: async () => {
+		const points = await collection.searchPoints({
+			vector: Array(1536).fill(0),
+			filter: { title, author },
+			limit: 9999,
+		})
+
+		return points
+			.map(({ payload }) => payloadSchema.parse(payload))
+			.sort((payload1, payload2) => payload1.index - payload2.index)
+			.map(({ content }) => content)
+	},
 	similarSegments: async ({ text }: { text: string }) => {
 		const contentPrediction = (
 			(await (
@@ -86,7 +98,7 @@ const Book = ({ title, author }: { title: string; author: string }) => ({
 		).data[0].embedding
 
 		const points = await collection.searchPoints({
-			embedding,
+			vector: embedding,
 			filter: { title, author },
 			limit: 10,
 		})

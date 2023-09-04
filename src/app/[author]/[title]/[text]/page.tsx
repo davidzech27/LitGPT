@@ -1,6 +1,8 @@
 import { type Metadata } from "next"
+import Link from "next/link"
 
 import Book from "~/data/Book"
+import Segments from "./Segments"
 
 export const runtime = "edge"
 
@@ -24,18 +26,38 @@ export default async function BookPage({ params }: { params: Params }) {
 	const author = decodeURIComponent(params.author)
 	const text = decodeURIComponent(params.text)
 
-	const segments = await Book({ title, author }).similarSegments({ text })
+	const index = Number(text)
 
-	return (
-		<main className="space-y-2.5 px-52 py-6 mobile:px-6">
-			{segments.map(({ index, content }) => (
-				<div
-					key={index}
-					className="cursor-pointer whitespace-pre rounded-md border bg-gray-100 px-6 py-3 outline-none transition duration-150 hover:bg-gray-200 focus-visible:bg-gray-200 active:bg-gray-200"
-				>
-					{content}
-				</div>
-			))}
-		</main>
-	)
+	if (isNaN(index)) {
+		const [segments, similarSegments] = await Promise.all([
+			Book({ title, author }).segments(),
+			Book({ title, author }).similarSegments({
+				text,
+			}),
+		])
+
+		return (
+			<main className="space-y-2.5 px-52 py-6 mobile:px-6">
+				{similarSegments.map(({ index }) => (
+					<Link
+						key={index}
+						href={`/${encodeURIComponent(
+							author,
+						)}/${encodeURIComponent(title)}/${index}`}
+						className="block rounded-md border bg-gray-50 px-6 py-3 opacity-60 outline-none transition duration-200 hover:opacity-100 focus-visible:opacity-100 active:opacity-100"
+					>
+						<Segments index={index} segments={segments} />
+					</Link>
+				))}
+			</main>
+		)
+	} else {
+		const segments = await Book({ title, author }).segments()
+
+		return (
+			<main className="px-52 py-6 mobile:px-6">
+				<Segments index={index} segments={segments} />
+			</main>
+		)
+	}
 }
