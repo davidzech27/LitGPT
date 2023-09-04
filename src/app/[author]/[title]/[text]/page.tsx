@@ -44,7 +44,8 @@ export default async function BookPage({ params }: { params: Params }) {
 						href={`/${encodeURIComponent(
 							author,
 						)}/${encodeURIComponent(title)}/${index}`}
-						className="block rounded-md border bg-gray-50 px-6 py-3 opacity-60 outline-none transition duration-200 hover:opacity-100 focus-visible:opacity-100 active:opacity-100"
+						draggable={false}
+						className="block select-text rounded-md border bg-gray-50 px-6 py-3 opacity-60 outline-none transition duration-200 hover:opacity-100 focus-visible:opacity-100 active:opacity-100"
 					>
 						<Segments index={index} segments={segments} />
 					</Link>

@@ -1,29 +1,58 @@
 "use client"
-import { useEffect, useRef } from "react"
+import { useRef, useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
 
 interface Props {
 	index: number
 	segments: string[]
 }
 
-export default function Segments({ index, segments }: Props) {
-	const scrollContainerRef = useRef<HTMLDivElement>(null)
+export default function Segments({ index: indexProp, segments }: Props) {
+	const [index, setIndex] = useState(indexProp)
 
-	useEffect(() => {
-		if (scrollContainerRef.current !== null)
-			scrollContainerRef.current.scrollLeft =
-				scrollContainerRef.current.clientWidth
-	}, [])
+	const canScrollRef = useRef(true)
 
 	return (
-		<div className="relative">
-			<p className="whitespace-pre-wrap">{segments[index]}</p>{" "}
-			<div
-				ref={scrollContainerRef}
-				className="absolute inset-0 overflow-x-scroll"
-			>
-				<div className="w-[300%]" />
+		<div
+			onWheel={(e) => {
+				console.log(e.deltaX)
+
+				if (canScrollRef.current && Math.abs(e.deltaX) >= 10) {
+					if (e.deltaX < 0)
+						setIndex((prevIndex) => Math.max(prevIndex - 1, 0))
+
+					if (e.deltaX > 0)
+						setIndex((prevIndex) =>
+							Math.min(prevIndex + 1, segments.length - 1),
+						)
+
+					canScrollRef.current = false
+				}
+
+				canScrollRef.current = !(Math.abs(e.deltaX) >= 10)
+			}}
+		>
+			<div className="mb-2.5 flex justify-between">
+				<div className="font-medium">{index + 1}</div>
+
+				<div className="font-medium">{segments.length}</div>
 			</div>
+
+			<AnimatePresence>
+				<motion.p
+					key={index}
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+					transition={{
+						ease: "easeOut",
+						duration: 0.15,
+					}}
+					className="whitespace-pre-wrap"
+				>
+					{segments[index]?.trim()}
+				</motion.p>
+			</AnimatePresence>
 		</div>
 	)
 }

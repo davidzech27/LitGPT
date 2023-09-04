@@ -12,7 +12,13 @@ export default function BookForm({ books }: Props) {
 	const [input, setInput] = useState("")
 
 	const [fuse] = useState(
-		() => new Fuse(books, { keys: ["title", "author"] }),
+		() =>
+			new Fuse(books, {
+				keys: [
+					{ name: "title", weight: 1 },
+					{ name: "author", weight: 0.5 },
+				],
+			}),
 	)
 
 	const bookResults = useMemo(

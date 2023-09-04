@@ -59,9 +59,9 @@ const Book = ({ title, author }: { title: string; author: string }) => ({
 		const points = await collection.searchPoints({
 			vector: Array(1536).fill(0),
 			filter: { title, author },
-			limit: 9999,
+			limit: 9998,
 		})
-
+		console.log(points.length)
 		return points
 			.map(({ payload }) => payloadSchema.parse(payload))
 			.sort((payload1, payload2) => payload1.index - payload2.index)
@@ -77,7 +77,7 @@ const Book = ({ title, author }: { title: string; author: string }) => ({
 							content: `Write a brief exerpt from a scene from the novel "${title}" by "${author}" relating to the following: ${text}`,
 						},
 					],
-					model: "gpt-3.5-turbo",
+					model: "gpt-3.5-turbo-0613",
 					temperature: 0,
 					frequency_penalty: 0.25,
 					presence_penalty: 0,
