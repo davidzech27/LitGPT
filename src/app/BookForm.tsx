@@ -33,7 +33,7 @@ export default function BookForm({ books }: Props) {
 				value={input}
 				onChange={(e) => setInput(e.target.value)}
 				placeholder="a book"
-				className="w-full rounded-md border bg-gray-100 px-3 py-1.5 font-medium outline-none transition duration-150 placeholder:font-light placeholder:text-black/20 hover:bg-gray-200 focus:bg-gray-200"
+				className="w-full rounded-md border bg-gray-100 px-3 py-1.5 font-medium outline-none transition duration-200 ease-out placeholder:font-light placeholder:text-black/20 hover:bg-gray-200 focus:bg-gray-200"
 			/>
 
 			<div className="absolute left-0 right-0">
@@ -46,8 +46,8 @@ export default function BookForm({ books }: Props) {
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
 								transition={{
+									duration: 0.2,
 									ease: "easeOut",
-									duration: 0.15,
 								}}
 								layout
 							>
@@ -55,7 +55,7 @@ export default function BookForm({ books }: Props) {
 									href={`/${encodeURIComponent(
 										bookResult.author,
 									)}/${encodeURIComponent(bookResult.title)}`}
-									className="block rounded-md border bg-gray-100 px-3 py-1.5 outline-none transition duration-150 hover:bg-gray-200 focus-visible:bg-gray-200 active:bg-gray-200"
+									className="block rounded-md border bg-gray-100 px-3 py-1.5 outline-none transition duration-200 ease-out hover:bg-gray-200 focus-visible:bg-gray-200 active:bg-gray-200"
 								>
 									<div className="font-medium leading-tight">
 										{bookResult.title}

@@ -35,7 +35,7 @@ export default function SearchForm({ title, author }: Props) {
 				onChange={(e) => setInput(e.target.value)}
 				autoFocus
 				placeholder="a scene"
-				className="w-52 w-full rounded-md border bg-gray-100 px-3 py-1.5 font-medium outline-none transition duration-150 placeholder:font-light placeholder:text-black/20 hover:bg-gray-200 focus:bg-gray-200"
+				className="w-52 w-full rounded-md border bg-gray-100 px-3 py-1.5 font-medium outline-none transition duration-200 ease-out placeholder:font-light placeholder:text-black/20 hover:bg-gray-200 focus:bg-gray-200"
 			/>
 
 			{loading && (

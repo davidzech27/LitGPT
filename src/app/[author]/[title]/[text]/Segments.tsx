@@ -7,8 +7,8 @@ interface Props {
 	segments: string[]
 }
 
-export default function Segments({ index: indexProp, segments }: Props) {
-	const [index, setIndex] = useState(indexProp)
+export default function Segments({ index: initialIndex, segments }: Props) {
+	const [index, setIndex] = useState(initialIndex)
 
 	const canScrollRef = useRef(true)
 
@@ -19,7 +19,7 @@ export default function Segments({ index: indexProp, segments }: Props) {
 			onWheel={(e) => {
 				console.log(e.deltaX)
 
-				if (canScrollRef.current && Math.abs(e.deltaX) >= 10) {
+				if (canScrollRef.current && Math.abs(e.deltaX) >= 15) {
 					if (e.deltaX < 0)
 						setIndex((prevIndex) => Math.max(prevIndex - 1, 0))
 
@@ -31,7 +31,7 @@ export default function Segments({ index: indexProp, segments }: Props) {
 					canScrollRef.current = false
 				}
 
-				canScrollRef.current = !(Math.abs(e.deltaX) >= 10)
+				canScrollRef.current = !(Math.abs(e.deltaX) >= 15)
 			}}
 			onTouchStart={(e) => {
 				touchXRef.current = e.touches[0]?.clientX ?? 0
@@ -45,7 +45,7 @@ export default function Segments({ index: indexProp, segments }: Props) {
 
 				console.log(deltaX)
 
-				if (canScrollRef.current && Math.abs(deltaX) >= 10) {
+				if (canScrollRef.current && Math.abs(deltaX) >= 5) {
 					if (deltaX > 0)
 						setIndex((prevIndex) => Math.max(prevIndex - 1, 0))
 
@@ -57,11 +57,35 @@ export default function Segments({ index: indexProp, segments }: Props) {
 					canScrollRef.current = false
 				}
 
-				canScrollRef.current = !(Math.abs(deltaX) >= 10)
+				canScrollRef.current = !(Math.abs(deltaX) >= 5)
 			}}
 		>
 			<div className="mb-2.5 flex justify-between">
-				<div className="font-medium">{index + 1}</div>
+				<div className="flex gap-1.5">
+					<div className="font-medium">{index + 1}</div>
+
+					<AnimatePresence>
+						{index !== initialIndex && (
+							<motion.button
+								onClick={(e) => {
+									e.stopPropagation()
+
+									setIndex(initialIndex)
+								}}
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								transition={{
+									duration: 0.2,
+									ease: "easeOut",
+								}}
+								className="font-light text-black/30 outline-none transition duration-200 ease-out hover:font-medium hover:text-black/100 focus-visible:font-medium focus-visible:text-black/100 active:font-medium active:text-black/100"
+							>
+								{initialIndex + 1}
+							</motion.button>
+						)}
+					</AnimatePresence>
+				</div>
 
 				<div className="font-medium">{segments.length}</div>
 			</div>
@@ -73,8 +97,8 @@ export default function Segments({ index: indexProp, segments }: Props) {
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
 					transition={{
+						duration: 0.2,
 						ease: "easeOut",
-						duration: 0.15,
 					}}
 					className="whitespace-pre-wrap"
 				>
