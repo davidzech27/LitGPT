@@ -12,6 +12,8 @@ export default function Segments({ index: indexProp, segments }: Props) {
 
 	const canScrollRef = useRef(true)
 
+	const touchXRef = useRef(0)
+
 	return (
 		<div
 			onWheel={(e) => {
@@ -30,6 +32,32 @@ export default function Segments({ index: indexProp, segments }: Props) {
 				}
 
 				canScrollRef.current = !(Math.abs(e.deltaX) >= 10)
+			}}
+			onTouchStart={(e) => {
+				touchXRef.current = e.touches[0]?.clientX ?? 0
+			}}
+			onTouchMove={(e) => {
+				const touchX = e.touches[0]?.clientX ?? 0
+
+				const deltaX = touchX - touchXRef.current
+
+				touchXRef.current = touchX
+
+				console.log(deltaX)
+
+				if (canScrollRef.current && Math.abs(deltaX) >= 10) {
+					if (deltaX > 0)
+						setIndex((prevIndex) => Math.max(prevIndex - 1, 0))
+
+					if (deltaX < 0)
+						setIndex((prevIndex) =>
+							Math.min(prevIndex + 1, segments.length - 1),
+						)
+
+					canScrollRef.current = false
+				}
+
+				canScrollRef.current = !(Math.abs(deltaX) >= 10)
 			}}
 		>
 			<div className="mb-2.5 flex justify-between">
