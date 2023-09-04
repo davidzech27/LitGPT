@@ -7,6 +7,7 @@ const env = createEnv({
 		OPENAI_SECRET_KEY: z.string(),
 		QDRANT_URL: z.string().url(),
 		QDRANT_API_KEY: z.string(),
+		EDGE_CONFIG: z.string().url()
 	},
 	client: {
 		NEXT_PUBLIC_CONTACT_EMAIL: z.string().email(),
@@ -16,6 +17,7 @@ const env = createEnv({
 		OPENAI_SECRET_KEY: process.env.OPENAI_SECRET_KEY,
 		QDRANT_URL: process.env.QDRANT_URL,
 		QDRANT_API_KEY: process.env.QDRANT_API_KEY,
+		EDGE_CONFIG: process.env.EDGE_CONFIG,
 		NEXT_PUBLIC_CONTACT_EMAIL: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
 	},
 })

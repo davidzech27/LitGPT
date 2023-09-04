@@ -16,15 +16,17 @@ export const GET = async (request: NextRequest) => {
 		return new NextResponse(null, { status: 403 })
 
 	const titleParam = request.nextUrl.searchParams.get("title")
+	const authorParam = request.nextUrl.searchParams.get("author")
+	const urlParam = request.nextUrl.searchParams.get("url")
 
-	const url = request.nextUrl.searchParams.get("url")
-
-	if (titleParam === null || url === null)
+	if (titleParam === null || authorParam === null || urlParam === null)
 		return new NextResponse(null, { status: 400 })
 
 	const title = decodeURIComponent(titleParam)
+	const author = decodeURIComponent(authorParam)
+	const url = decodeURIComponent(urlParam)
 
-	const html = await (await fetch(url, { method: "GET" })).text()
+	const html = await (await fetch(url)).text()
 
 	if (html === null) return new NextResponse(null, { status: 400 })
 
@@ -35,7 +37,8 @@ export const GET = async (request: NextRequest) => {
 	const chapters = elements.reduce<cheerio.Element[][]>(
 		(prev, cur) =>
 			["h1", "h2"].includes(cur.tagName) &&
-			$(cur).text().toLowerCase().includes("chapter")
+			($(cur).text().toLowerCase().includes("chapter") ||
+				$(cur).text().toLowerCase().includes("scene"))
 				? [...prev, [cur]]
 				: [
 						...prev.slice(0, prev.length - 1),
@@ -93,7 +96,7 @@ export const GET = async (request: NextRequest) => {
 				"started",
 			)
 
-			await Book({ title }).addSegment({
+			await Book({ title, author }).addSegment({
 				index: currentSegmentIndex,
 				content: segment,
 			})

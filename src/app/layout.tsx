@@ -1,7 +1,7 @@
 import "./globals.css"
 
 export const metadata = {
-	title: "LitGPT",
+	title: { default: "LitGPT", template: "%s | LitGPT" },
 	description: "Find any scene in any book",
 }
 

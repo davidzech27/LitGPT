@@ -2,18 +2,20 @@ import { z } from "zod"
 
 import qdrant from "~/qdrant"
 import openai from "~/openai"
+import edgeConfig from "~/edgeConfig"
 
 const collection = qdrant({ collection: "litgpt" })
 
 const payloadSchema = z.object({
 	title: z.string(),
+	author: z.string(),
 	index: z.number(),
 	content: z.string(),
 })
 
 type Payload = z.infer<typeof payloadSchema>
 
-const Book = ({ title }: { title: string }) => ({
+const Book = ({ title, author }: { title: string; author: string }) => ({
 	addSegment: async ({
 		index,
 		content,
@@ -21,13 +23,19 @@ const Book = ({ title }: { title: string }) => ({
 		index: number
 		content: string
 	}) => {
+		const books = await edgeConfig.get("books")
+
+		const bookId = books.find(
+			(book) => book.title === title && book.author === author,
+		)?.id
+
+		if (bookId === undefined)
+			throw new Error(
+				`${title} by ${author} not yet added to edge config`,
+			)
+
 		const id = Number(
-			title
-				.split("")
-				.map((char) => char.charCodeAt(0) % 10)
-				.filter((_, index) => index % 2 === 0)
-				.concat(index)
-				.join(""),
+			bookId.toString().padStart(6, "0").concat(index.toString()),
 		)
 
 		const embedding = (
@@ -42,7 +50,7 @@ const Book = ({ title }: { title: string }) => ({
 		await collection.insertPoints([
 			{
 				id,
-				payload: { title, index, content } satisfies Payload,
+				payload: { title, author, index, content } satisfies Payload,
 				vector: embedding,
 			},
 		])
@@ -54,7 +62,7 @@ const Book = ({ title }: { title: string }) => ({
 					messages: [
 						{
 							role: "user",
-							content: `Write a brief exerpt from a scene from a novel "${title}" relating to the following: ${text}`,
+							content: `Write a brief exerpt from a scene from the novel "${title}" by "${author}" relating to the following: ${text}`,
 						},
 					],
 					model: "gpt-3.5-turbo",
@@ -65,7 +73,9 @@ const Book = ({ title }: { title: string }) => ({
 				})
 			).json()) as { choices: [{ message: { content: string } }] }
 		).choices[0].message.content
-		console.log({ contentPrediction })
+
+		console.info("Content prediction:", contentPrediction)
+
 		const embedding = (
 			(await (
 				await openai.createEmbedding({
@@ -77,7 +87,7 @@ const Book = ({ title }: { title: string }) => ({
 
 		const points = await collection.searchPoints({
 			embedding,
-			filter: { title },
+			filter: { title, author },
 			limit: 10,
 		})
 
