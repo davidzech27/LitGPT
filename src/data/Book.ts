@@ -68,6 +68,8 @@ const Book = ({ title, author }: { title: string; author: string }) => ({
 			.map(({ content }) => content)
 	},
 	similarSegments: async ({ text }: { text: string }) => {
+		console.info("Scene query", { text, title, author })
+
 		const contentPrediction = (
 			(await (
 				await openai.createChatCompletion({
@@ -86,7 +88,7 @@ const Book = ({ title, author }: { title: string; author: string }) => ({
 			).json()) as { choices: [{ message: { content: string } }] }
 		).choices[0].message.content
 
-		console.info("Content prediction:", contentPrediction)
+		console.info("Content prediction", { contentPrediction, title, author })
 
 		const embedding = (
 			(await (
@@ -102,6 +104,8 @@ const Book = ({ title, author }: { title: string; author: string }) => ({
 			filter: { title, author },
 			limit: 10,
 		})
+
+		console.info("Segment results", { points, title, author })
 
 		return points
 			.map(({ payload }) => payloadSchema.parse(payload))
