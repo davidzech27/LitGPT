@@ -2,7 +2,7 @@ import "./globals.css"
 
 export const metadata = {
 	title: { default: "LitGPT", template: "%s | LitGPT" },
-	description: "Find any scene in any book",
+	description: "Find any scene from your AP Lit books",
 }
 
 export default function RootLayout({
