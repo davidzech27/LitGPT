@@ -11,8 +11,8 @@ export default function RootLayout({
 	children: React.ReactNode
 }) {
 	return (
-		<html lang="en" className="absolute inset-0">
-			<body>{children}</body>
+		<html lang="en">
+			<body className="absolute inset-0">{children}</body>
 		</html>
 	)
 }
