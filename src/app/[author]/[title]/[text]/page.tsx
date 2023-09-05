@@ -29,16 +29,15 @@ export default async function BookPage({ params }: { params: Params }) {
 
 	const index = Number(text)
 
-	await discord.send(
-		`Query: ${JSON.stringify({ title, author, text }, null, 4)}`,
-	)
-
 	if (isNaN(index)) {
 		const [segments, similarSegments] = await Promise.all([
 			Book({ title, author }).segments(),
 			Book({ title, author }).similarSegments({
 				text,
 			}),
+			discord.send(
+				`Query: ${JSON.stringify({ title, author, text }, null, 4)}`,
+			),
 		])
 
 		return (
@@ -58,7 +57,12 @@ export default async function BookPage({ params }: { params: Params }) {
 			</main>
 		)
 	} else {
-		const segments = await Book({ title, author }).segments()
+		const [segments] = await Promise.all([
+			Book({ title, author }).segments(),
+			discord.send(
+				`Query: ${JSON.stringify({ title, author, text }, null, 4)}`,
+			),
+		])
 
 		return (
 			<main className="px-52 py-6 mobile:px-6">
