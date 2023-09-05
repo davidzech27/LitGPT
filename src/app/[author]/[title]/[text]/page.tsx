@@ -3,6 +3,7 @@ import Link from "next/link"
 
 import Book from "~/data/Book"
 import Segments from "./Segments"
+import discord from "~/discord"
 
 export const runtime = "edge"
 
@@ -27,6 +28,10 @@ export default async function BookPage({ params }: { params: Params }) {
 	const text = decodeURIComponent(params.text)
 
 	const index = Number(text)
+
+	await discord.send(
+		`Query: ${JSON.stringify({ title, author, text }, null, 4)}`,
+	)
 
 	if (isNaN(index)) {
 		const [segments, similarSegments] = await Promise.all([
