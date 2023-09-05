@@ -35,9 +35,6 @@ export default async function BookPage({ params }: { params: Params }) {
 			Book({ title, author }).similarSegments({
 				text,
 			}),
-			discord.send(
-				`Query: ${JSON.stringify({ title, author, text }, null, 4)}`,
-			),
 		])
 
 		return (
@@ -60,7 +57,11 @@ export default async function BookPage({ params }: { params: Params }) {
 		const [segments] = await Promise.all([
 			Book({ title, author }).segments(),
 			discord.send(
-				`Query: ${JSON.stringify({ title, author, text }, null, 4)}`,
+				`Segment query ${JSON.stringify(
+					{ title, author, index },
+					null,
+					4,
+				)}`,
 			),
 		])
 

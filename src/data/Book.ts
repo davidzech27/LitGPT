@@ -3,6 +3,7 @@ import { z } from "zod"
 import qdrant from "~/qdrant"
 import openai from "~/openai"
 import edgeConfig from "~/edgeConfig"
+import discord from "~/discord"
 
 const collection = qdrant({ collection: "litgpt" })
 
@@ -61,7 +62,7 @@ const Book = ({ title, author }: { title: string; author: string }) => ({
 			filter: { title, author },
 			limit: 9998,
 		})
-		console.log(points.length)
+
 		return points
 			.map(({ payload }) => payloadSchema.parse(payload))
 			.sort((payload1, payload2) => payload1.index - payload2.index)
@@ -107,9 +108,19 @@ const Book = ({ title, author }: { title: string; author: string }) => ({
 
 		console.info("Segment results", { points, title, author })
 
-		return points
+		const similarSegments = points
 			.map(({ payload }) => payloadSchema.parse(payload))
 			.map(({ index, content }) => ({ index, content }))
+
+		await discord.send(
+			`Query ${JSON.stringify(
+				{ title, author, text, contentPrediction, similarSegments },
+				null,
+				4,
+			)}`,
+		)
+
+		return similarSegments
 	},
 })
 
