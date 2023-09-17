@@ -57,14 +57,27 @@ const Book = ({ title, author }: { title: string; author: string }) => ({
 		])
 	},
 	segments: async () => {
-		const points = await collection.searchPoints({
-			vector: Array(1536).fill(0),
-			filter: { title, author },
-			limit: 9998,
-		})
+		return (
+			await collection.searchPoints({
+				vector: Array(1536).fill(0),
+				filter: {},
+				limit: 9998,
+			})
+		)
+			.map(({ payload }) => {
+				const parsed = payloadSchema.safeParse(payload)
 
-		return points
-			.map(({ payload }) => payloadSchema.parse(payload))
+				if (!parsed.success) {
+					return undefined
+				}
+
+				return parsed.data
+			})
+			.filter(Boolean)
+			.filter(
+				(segment) =>
+					segment.title === title && segment.author === author,
+			)
 			.sort((payload1, payload2) => payload1.index - payload2.index)
 			.map(({ content }) => content)
 	},
@@ -77,14 +90,14 @@ const Book = ({ title, author }: { title: string; author: string }) => ({
 					messages: [
 						{
 							role: "user",
-							content: `Write a brief exerpt from a scene from the novel "${title}" by "${author}" relating to the following: ${text}`,
+							content: `Write some quotes that could be from the scene in the novel "${title}" by "${author}" relating to the following: ${text}`,
 						},
 					],
 					model: "gpt-3.5-turbo-0613",
 					temperature: 0,
 					frequency_penalty: 0.25,
 					presence_penalty: 0,
-					max_tokens: 300,
+					max_tokens: 150,
 				})
 			).json()) as { choices: [{ message: { content: string } }] }
 		).choices[0].message.content
