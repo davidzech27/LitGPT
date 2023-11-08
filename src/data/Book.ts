@@ -86,6 +86,7 @@ const Book = ({ title, author }: { title: string; author: string }) => ({
 		console.info("Scene query", { text, title, author })
 		const chatCompletion = await (
 			await fetch("https://api.openai.com/v1/chat/completions", {
+				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 					Authorization: `Bearer ${env.OPENAI_SECRET_KEY}`,
