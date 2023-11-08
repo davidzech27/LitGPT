@@ -83,23 +83,26 @@ const Book = ({ title, author }: { title: string; author: string }) => ({
 	},
 	similarSegments: async ({ text }: { text: string }) => {
 		console.info("Scene query", { text, title, author })
-
+		const chatCompletionJSON = await (
+			await openai.createChatCompletion({
+				messages: [
+					{
+						role: "user",
+						content: `Write a brief exerpt that would be from a scene in the novel "${title}" by "${author}" described by the following: ${text}`,
+					},
+				],
+				model: "gpt-3.5-turbo-0613",
+				temperature: 0,
+				frequency_penalty: 0.25,
+				presence_penalty: 0,
+				max_tokens: 150,
+			})
+		).json()
+		console.log({ chatCompletionJSON })
 		const contentPrediction = (
-			(await (
-				await openai.createChatCompletion({
-					messages: [
-						{
-							role: "user",
-							content: `Write some quotes that could be from the scene in the novel "${title}" by "${author}" relating to the following: ${text}`,
-						},
-					],
-					model: "gpt-3.5-turbo-0613",
-					temperature: 0,
-					frequency_penalty: 0.25,
-					presence_penalty: 0,
-					max_tokens: 150,
-				})
-			).json()) as { choices: [{ message: { content: string } }] }
+			chatCompletionJSON as {
+				choices: [{ message: { content: string } }]
+			}
 		).choices[0].message.content
 
 		console.info("Content prediction", { contentPrediction, title, author })

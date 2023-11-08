@@ -32,29 +32,45 @@ export const GET = async (request: NextRequest) => {
 
 	const $ = cheerio.load(html)
 
-	const elements = Array.from($("h1, h2, p"))
+	let elements = Array.from($("h1, h2, p"))
 
-	const chapters = elements.reduce<cheerio.Element[][]>(
-		(prev, cur) =>
-			["h1", "h2"].includes(cur.tagName) &&
-			($(cur).text().toLowerCase().includes("chapter") ||
-				$(cur).text().toLowerCase().includes("scene"))
-				? [...prev, [cur]]
-				: [
-						...prev.slice(0, prev.length - 1),
-						[...(prev.at(-1) ?? []), cur],
-				  ],
+	const chapters =
+		elements.length !== 0
+			? elements.reduce<string[][]>(
+					(prev, cur) =>
+						["h1", "h2"].includes(cur.tagName) &&
+						($(cur).text().toLowerCase().includes("chapter") ||
+							$(cur).text().toLowerCase().includes("scene"))
+							? [...prev, [$(cur).text()]]
+							: [
+									...prev.slice(0, prev.length - 1),
+									[...(prev.at(-1) ?? []), $(cur).text()],
+							  ],
 
-		[],
-	)
+					[],
+			  )
+			: ($("body").html() ?? "")
+					.split(/<br( \/)?>/g)
+					.filter(Boolean)
+					.map((line) => line.concat("\n"))
+					.reduce<string[][]>(
+						(prev, cur) =>
+							cur.toLowerCase().includes("chapter")
+								? [...prev, [cur]]
+								: [
+										...prev.slice(0, prev.length - 1),
+										[...(prev.at(-1) ?? []), cur],
+								  ],
+						[],
+					)
 
-	const segments = chapters.flatMap((elementGroup) => {
+	const segments = chapters.flatMap((chapter) => {
 		const groupSegments: string[] = []
 
 		let currentSegment = ""
 
-		for (const element of elementGroup) {
-			currentSegment += $(element).text()
+		for (const paragraph of chapter) {
+			currentSegment += paragraph
 
 			const currentSegmentWordCount = currentSegment.split(/\s+/).length
 
