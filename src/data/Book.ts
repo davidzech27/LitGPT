@@ -1,5 +1,6 @@
 import { z } from "zod"
 
+import env from "~/env.mjs"
 import qdrant from "~/qdrant"
 import openai from "~/openai"
 import edgeConfig from "~/edgeConfig"
@@ -84,18 +85,24 @@ const Book = ({ title, author }: { title: string; author: string }) => ({
 	similarSegments: async ({ text }: { text: string }) => {
 		console.info("Scene query", { text, title, author })
 		const chatCompletion = await (
-			await openai.createChatCompletion({
-				messages: [
-					{
-						role: "user",
-						content: `Write a brief exerpt that would be from a scene in the novel "${title}" by "${author}" described by the following: ${text}`,
-					},
-				],
-				model: "gpt-3.5-turbo-0613",
-				temperature: 0,
-				frequency_penalty: 0.25,
-				presence_penalty: 0,
-				max_tokens: 150,
+			await fetch("https://api.openai.com/v1/chat/completions", {
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${env.OPENAI_SECRET_KEY}`,
+				},
+				body: JSON.stringify({
+					messages: [
+						{
+							role: "user",
+							content: `Write a brief exerpt that would be from a scene in the novel "${title}" by "${author}" described by the following: ${text}`,
+						},
+					],
+					model: "gpt-3.5-turbo-0613",
+					temperature: 0,
+					frequency_penalty: 0.25,
+					presence_penalty: 0,
+					max_tokens: 150,
+				}),
 			})
 		).text()
 		console.log({ chatCompletion })
