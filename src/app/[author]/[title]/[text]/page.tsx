@@ -7,8 +7,6 @@ import discord from "~/discord"
 
 export const runtime = "edge"
 
-export const dynamic = "force-dynamic"
-
 interface Params {
 	title: string
 	author: string

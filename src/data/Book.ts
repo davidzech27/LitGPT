@@ -83,7 +83,7 @@ const Book = ({ title, author }: { title: string; author: string }) => ({
 	},
 	similarSegments: async ({ text }: { text: string }) => {
 		console.info("Scene query", { text, title, author })
-		const chatCompletionJSON = await (
+		const chatCompletion = await (
 			await openai.createChatCompletion({
 				messages: [
 					{
@@ -97,10 +97,10 @@ const Book = ({ title, author }: { title: string; author: string }) => ({
 				presence_penalty: 0,
 				max_tokens: 150,
 			})
-		).json()
-		console.log({ chatCompletionJSON })
+		).text()
+		console.log({ chatCompletion })
 		const contentPrediction = (
-			chatCompletionJSON as {
+			JSON.parse(chatCompletion) as {
 				choices: [{ message: { content: string } }]
 			}
 		).choices[0].message.content
